@@ -1,0 +1,141 @@
+-- --------------------------------------------------------
+-- Host:                         127.0.0.1
+-- Versione server:              8.4.3 - MySQL Community Server - GPL
+-- S.O. server:                  Win64
+-- HeidiSQL Versione:            12.8.0.6908
+-- --------------------------------------------------------
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+
+-- Dump della struttura del database libreria_pyside_esame
+CREATE DATABASE IF NOT EXISTS `libreria_pyside_esame` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `libreria_pyside_esame`;
+
+-- Dump della struttura di tabella libreria_pyside_esame.categorie
+CREATE TABLE IF NOT EXISTS `categorie` (
+  `id_categoria` int NOT NULL AUTO_INCREMENT,
+  `nome` varchar(100) NOT NULL,
+  PRIMARY KEY (`id_categoria`),
+  UNIQUE KEY `nome` (`nome`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Dump dei dati della tabella libreria_pyside_esame.categorie: ~3 rows (circa)
+INSERT INTO `categorie` (`id_categoria`, `nome`) VALUES
+	(1, 'Narrativa'),
+	(3, 'Ragazzi'),
+	(2, 'Saggistica');
+
+-- Dump della struttura di tabella libreria_pyside_esame.libri
+CREATE TABLE IF NOT EXISTS `libri` (
+  `id_libro` int NOT NULL AUTO_INCREMENT,
+  `titolo` varchar(200) NOT NULL,
+  `autore` varchar(150) NOT NULL,
+  `isbn` varchar(20) DEFAULT NULL,
+  `prezzo` decimal(8,2) NOT NULL,
+  `id_categoria` int DEFAULT NULL,
+  PRIMARY KEY (`id_libro`),
+  UNIQUE KEY `isbn` (`isbn`),
+  KEY `id_categoria` (`id_categoria`),
+  CONSTRAINT `libri_ibfk_1` FOREIGN KEY (`id_categoria`) REFERENCES `categorie` (`id_categoria`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Dump dei dati della tabella libreria_pyside_esame.libri: ~2 rows (circa)
+INSERT INTO `libri` (`id_libro`, `titolo`, `autore`, `isbn`, `prezzo`, `id_categoria`) VALUES
+	(1, 'il viaggio', 'pippo', NULL, 20.98, 1),
+	(2, 'bfgjhgh', 'fgffg', NULL, 15.00, NULL);
+
+-- Dump della struttura di tabella libreria_pyside_esame.magazzino
+CREATE TABLE IF NOT EXISTS `magazzino` (
+  `id_libro` int NOT NULL,
+  `copie` int NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id_libro`),
+  CONSTRAINT `magazzino_ibfk_1` FOREIGN KEY (`id_libro`) REFERENCES `libri` (`id_libro`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Dump dei dati della tabella libreria_pyside_esame.magazzino: ~2 rows (circa)
+INSERT INTO `magazzino` (`id_libro`, `copie`) VALUES
+	(1, 6),
+	(2, 4);
+
+-- Dump della struttura di tabella libreria_pyside_esame.operatori
+CREATE TABLE IF NOT EXISTS `operatori` (
+  `id_operatore` int NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) NOT NULL,
+  `password` varchar(100) NOT NULL,
+  `nome` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id_operatore`),
+  UNIQUE KEY `username` (`username`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Dump dei dati della tabella libreria_pyside_esame.operatori: ~1 rows (circa)
+INSERT INTO `operatori` (`id_operatore`, `username`, `password`, `nome`) VALUES
+	(1, 'admin', 'root', 'Matteo');
+
+-- Dump della struttura di tabella libreria_pyside_esame.utenti
+CREATE TABLE IF NOT EXISTS `utenti` (
+  `id_utente` int NOT NULL AUTO_INCREMENT,
+  `nome` varchar(100) NOT NULL,
+  `cognome` varchar(100) NOT NULL,
+  `indirizzo` varchar(150) DEFAULT NULL,
+  `citta` varchar(100) DEFAULT NULL,
+  `cap` varchar(10) DEFAULT NULL,
+  `telefono` varchar(30) DEFAULT NULL,
+  `email` varchar(120) DEFAULT NULL,
+  PRIMARY KEY (`id_utente`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Dump dei dati della tabella libreria_pyside_esame.utenti: ~2 rows (circa)
+INSERT INTO `utenti` (`id_utente`, `nome`, `cognome`, `indirizzo`, `citta`, `cap`, `telefono`, `email`) VALUES
+	(1, 'pippo', 'bruto', NULL, NULL, NULL, '1234567890', 'abcde@gmail.com'),
+	(2, 'mauro', 'lupo', NULL, 'Milano', NULL, '0987654321', 'qwerty@gmail.com');
+
+-- Dump della struttura di tabella libreria_pyside_esame.vendite
+CREATE TABLE IF NOT EXISTS `vendite` (
+  `id_vendita` int NOT NULL AUTO_INCREMENT,
+  `id_utente` int NOT NULL,
+  `id_operatore` int DEFAULT NULL,
+  `data_vendita` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id_vendita`),
+  KEY `id_utente` (`id_utente`),
+  KEY `id_operatore` (`id_operatore`),
+  CONSTRAINT `vendite_ibfk_1` FOREIGN KEY (`id_utente`) REFERENCES `utenti` (`id_utente`),
+  CONSTRAINT `vendite_ibfk_2` FOREIGN KEY (`id_operatore`) REFERENCES `operatori` (`id_operatore`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Dump dei dati della tabella libreria_pyside_esame.vendite: ~2 rows (circa)
+INSERT INTO `vendite` (`id_vendita`, `id_utente`, `id_operatore`, `data_vendita`) VALUES
+	(1, 1, 1, '2026-11-23 23:35:07'),
+	(2, 2, 1, '2026-11-23 23:37:17');
+
+-- Dump della struttura di tabella libreria_pyside_esame.vendite_dettagli
+CREATE TABLE IF NOT EXISTS `vendite_dettagli` (
+  `id_dettaglio` int NOT NULL AUTO_INCREMENT,
+  `id_vendita` int NOT NULL,
+  `id_libro` int NOT NULL,
+  `quantita` int NOT NULL,
+  `prezzo_unitario` decimal(8,2) NOT NULL,
+  PRIMARY KEY (`id_dettaglio`),
+  KEY `id_vendita` (`id_vendita`),
+  KEY `id_libro` (`id_libro`),
+  CONSTRAINT `vendite_dettagli_ibfk_1` FOREIGN KEY (`id_vendita`) REFERENCES `vendite` (`id_vendita`),
+  CONSTRAINT `vendite_dettagli_ibfk_2` FOREIGN KEY (`id_libro`) REFERENCES `libri` (`id_libro`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Dump dei dati della tabella libreria_pyside_esame.vendite_dettagli: ~2 rows (circa)
+INSERT INTO `vendite_dettagli` (`id_dettaglio`, `id_vendita`, `id_libro`, `quantita`, `prezzo_unitario`) VALUES
+	(1, 1, 1, 2, 20.98),
+	(2, 2, 1, 1, 20.98);
+
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
